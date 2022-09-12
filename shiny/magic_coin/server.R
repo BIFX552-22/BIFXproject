@@ -18,7 +18,7 @@ source('magic_coin.R')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-
+    
     # keep track of each trial we've performed
     trials <- reactiveVal(tibble(nheads = numeric(), seed = integer()))
     
@@ -31,7 +31,7 @@ shinyServer(function(input, output) {
         
         # calculate running-best-value
         tmp$nmax <- tmp$nheads[1]
-
+        
         for(i in 2:nrow(tmp))
         {
             if(tmp$nheads[i] > tmp$nmax[i-1])
@@ -42,7 +42,7 @@ shinyServer(function(input, output) {
             }
         }
         
-        # generate figure
+        # generate figure - plot trials by running-best-value
         # ...
     })
     
@@ -51,12 +51,12 @@ shinyServer(function(input, output) {
         if(nrow(trials()) > 0)
         {
             best <- which.max(trials()$nheads)
-        
+            
             mssg <- paste('The best seed so far is', 
-                  trials()$seed[best],
-                  'which results in',
-                  trials()$nheads[best],
-                  'successes in a row.')
+                          trials()$seed[best],
+                          'which results in',
+                          trials()$nheads[best],
+                          'successes in a row.')
         }else{
             mssg <- 'Add some trials'
         }
@@ -66,13 +66,21 @@ shinyServer(function(input, output) {
     
     # Buttons to do additional trials
     observeEvent(input$add1, {
-        trials(magic_coin(as.integer(runif(10, 1, .Machine$integer.max)), trials()))
+        runif(10, 1, .Machine$integer.max) %>%
+            as.integer() %>%
+            magic_coin(trials()) %>%
+            trials()
     })
-
+    
     observeEvent(input$add2, {
-        # ...
+        runif(100, 1, .Machine$integer.max) %>%
+            as.integer() %>%
+            magic_coin(trials()) %>%
+            trials()
     })
     observeEvent(input$add3, {
-        # ...
-    })
+        runif(1000, 1, .Machine$integer.max) %>%
+            as.integer() %>%
+            magic_coin(trials()) %>%
+            trials()    })
 })
